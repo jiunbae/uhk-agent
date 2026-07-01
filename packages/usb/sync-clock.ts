@@ -5,7 +5,10 @@ import { setTimeout as sleep } from 'node:timers/promises';
 import Uhk, { errorHandler, yargs } from './src/index.js';
 
 const CLOCK_FIRMWARE_REPO = 'jiunbae/firmware';
-const CLOCK_FIRMWARE_TAG = '979a01324';
+const CLOCK_FIRMWARE_TAGS = [
+    '979a01324',
+    '2b9e6ac47',
+];
 
 function getSetClockCommand(): string {
     const now = new Date();
@@ -19,13 +22,13 @@ function formatError(error: unknown): string {
 async function assertClockFirmware(operations: ReturnType<typeof Uhk>['operations']): Promise<void> {
     const version = await operations.getDeviceVersionInfo();
 
-    if (version.firmwareGitRepo === CLOCK_FIRMWARE_REPO && version.firmwareGitTag === CLOCK_FIRMWARE_TAG) {
+    if (version.firmwareGitRepo === CLOCK_FIRMWARE_REPO && CLOCK_FIRMWARE_TAGS.includes(version.firmwareGitTag ?? '')) {
         return;
     }
 
     throw new Error(
         `The connected keyboard does not support setClock. ` +
-        `Expected firmware ${CLOCK_FIRMWARE_REPO}/${CLOCK_FIRMWARE_TAG}, ` +
+        `Expected firmware ${CLOCK_FIRMWARE_REPO}/${CLOCK_FIRMWARE_TAGS.join('|')}, ` +
         `got ${version.firmwareGitRepo ?? 'unknown'}/${version.firmwareGitTag ?? 'unknown'}.`
     );
 }
