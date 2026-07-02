@@ -4,10 +4,20 @@ import { setTimeout as sleep } from 'node:timers/promises';
 
 import Uhk, { errorHandler, yargs } from './src/index.js';
 
-const CLOCK_FIRMWARE_REPO = 'jiunbae/firmware';
-const CLOCK_FIRMWARE_TAGS = [
-    '979a01324',
-    '2b9e6ac47',
+const CLOCK_FIRMWARES = [
+    {
+        repo: 'jiunbae/firmware',
+        tags: [
+            '979a01324',
+            '2b9e6ac47',
+        ],
+    },
+    {
+        repo: 'jiunbae/uhk-firmware',
+        tags: [
+            '60a81451b',
+        ],
+    },
 ];
 
 function getSetClockCommand(): string {
@@ -22,13 +32,16 @@ function formatError(error: unknown): string {
 async function assertClockFirmware(operations: ReturnType<typeof Uhk>['operations']): Promise<void> {
     const version = await operations.getDeviceVersionInfo();
 
-    if (version.firmwareGitRepo === CLOCK_FIRMWARE_REPO && CLOCK_FIRMWARE_TAGS.includes(version.firmwareGitTag ?? '')) {
+    if (CLOCK_FIRMWARES.some(firmware =>
+        version.firmwareGitRepo === firmware.repo && firmware.tags.includes(version.firmwareGitTag ?? '')
+    )) {
         return;
     }
 
+    const expectedFirmwares = CLOCK_FIRMWARES.map(firmware => `${firmware.repo}/${firmware.tags.join('|')}`).join(', ');
     throw new Error(
         `The connected keyboard does not support setClock. ` +
-        `Expected firmware ${CLOCK_FIRMWARE_REPO}/${CLOCK_FIRMWARE_TAGS.join('|')}, ` +
+        `Expected firmware ${expectedFirmwares}, ` +
         `got ${version.firmwareGitRepo ?? 'unknown'}/${version.firmwareGitTag ?? 'unknown'}.`
     );
 }
