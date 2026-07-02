@@ -16,6 +16,7 @@ const CLOCK_FIRMWARES = [
         repo: 'jiunbae/uhk-firmware',
         tags: [
             '60a81451b',
+            '997b44cbf',
         ],
     },
 ];
