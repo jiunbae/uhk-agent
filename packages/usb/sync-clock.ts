@@ -19,6 +19,7 @@ const CLOCK_FIRMWARES = [
             '997b44cbf',
             'aa2ccab93',
             '4904b48fb',
+            '6871f7b8a',
         ],
     },
 ];
